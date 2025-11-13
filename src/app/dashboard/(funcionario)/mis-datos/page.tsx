@@ -39,11 +39,7 @@ export default function MisDatosPage() {
   const { data: estadisticas, isLoading: isLoadingStats } = useEstadisticasPersonales();
   const { data: resumen, isLoading: isLoadingResumen } = useResumenActividades();
 
-  // Debug: Ver qué datos están llegando
-  console.log("Perfil data:", perfil);
-  console.log("Usuario data:", perfil?.usuario);
-  console.log("Rol data:", perfil?.usuario?.rol);
-  console.log("Error perfil:", errorPerfil);
+
 
   const [showEditDatos, setShowEditDatos] = useState(false);
   const [showEditEmail, setShowEditEmail] = useState(false);

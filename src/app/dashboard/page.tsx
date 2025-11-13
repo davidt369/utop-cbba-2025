@@ -19,7 +19,7 @@ export default function DashboardPage() {
   const { stats, activities, loading, error } = useDashboard()
   const { reportes, loading: loadingReporte, error: errorReporte } = useReportes()
 
-  console.log('User in DashboardPage:', user)
+
   // Redirigir según rol
   if (user?.rol?.nombre_rol === 'SuperAdministrador') redirect('/dashboard/usuarios')
   if (user?.rol?.nombre_rol === 'Usuario') redirect('/dashboard/sobre-institucion')
