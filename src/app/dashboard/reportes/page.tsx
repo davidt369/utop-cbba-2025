@@ -154,22 +154,25 @@ export default function ReportesPage() {
                                     <div className="space-y-3">
                                         {/* Formatos principales */}
                                         <div className="flex gap-2">
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={() => handleDownload(reporte.key as keyof typeof reportes, 'pdf', reporte.filters[0].key)}
-                                                disabled={loadingReporte}
-                                                className="flex-1"
-                                            >
-                                                <FileText className="h-3 w-3 mr-1" />
-                                                PDF
-                                            </Button>
+                                            {/* Solo mostrar PDF para todos excepto Dashboard */}
+                                            {reporte.key !== 'dashboard' && (
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    onClick={() => handleDownload(reporte.key as keyof typeof reportes, 'pdf', reporte.filters[0].key)}
+                                                    disabled={loadingReporte}
+                                                    className="flex-1"
+                                                >
+                                                    <FileText className="h-3 w-3 mr-1" />
+                                                    PDF
+                                                </Button>
+                                            )}
                                             <Button
                                                 size="sm"
                                                 variant="outline"
                                                 onClick={() => handleDownload(reporte.key as keyof typeof reportes, 'excel', reporte.filters[0].key)}
                                                 disabled={loadingReporte}
-                                                className="flex-1"
+                                                className={reporte.key === 'dashboard' ? 'w-full' : 'flex-1'}
                                             >
                                                 <FileSpreadsheet className="h-3 w-3 mr-1" />
                                                 Excel
