@@ -7,7 +7,9 @@ import { join } from "path";
 const nextConfig: NextConfig = {
   /* config options here */
   // Allow HMR websocket connections from the remote devtunnel
-  allowedDevOrigins: ["http://127.0.0.1:8000/api"],
+  allowedDevOrigins: [
+    "https://backend-laravel-utop-production.up.railway.app/api",
+  ],
 
   webpack: (config, { isServer }) => {
     // Configuración para react-pdf con mejor compatibilidad para Next.js 15
@@ -53,12 +55,14 @@ const nextConfig: NextConfig = {
       // Proxy para endpoints de la API autenticada (usado por el frontend)
       {
         source: "/api/auth/:path*",
-        destination: "http://127.0.0.1:8000/api/auth/:path*",
+        destination:
+          "https://backend-laravel-utop-production.up.railway.app/api/auth/:path*",
       },
       // Proxy para archivos servidos desde storage (cuando Storage::url() devuelve /storage/...)
       {
         source: "/storage/:path*",
-        destination: "http://127.0.0.1:8000/storage/:path*",
+        destination:
+          "https://backend-laravel-utop-production.up.railway.app/storage/:path*",
       },
     ];
   },

@@ -1,14 +1,14 @@
 import axios from "axios";
 import { getToken } from "@/store/auth.store";
 
-// baseURL apunta al backend Laravel API. Ajusta env NEXT_PUBLIC_API_URL a 'http://127.0.0.1:8000/api'
+// baseURL apunta al backend Laravel API. Ajusta env NEXT_PUBLIC_API_URL a 'https://backend-laravel-utop-production.up.railway.app/api'
 // baseURL del backend Laravel API (sin el prefijo /auth). Ajusta env NEXT_PUBLIC_API_URL si es necesario.
 // baseURL del backend Laravel API, incluye /api para los endpoints
 // BaseURL relativo para proxy interno y evitar CORS
 // Debug: verificar la variable de entorno
 
 // URL del backend Laravel API - actualiza según donde esté corriendo tu backend
-const baseURL = "http://127.0.0.1:8000/api";
+const baseURL = "https://backend-laravel-utop-production.up.railway.app/api";
 
 const api = axios.create({
   baseURL: baseURL, // Hardcodeado directamente para forzar actualización
