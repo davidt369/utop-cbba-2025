@@ -438,7 +438,7 @@ export function AusenciaEditDialog() {
                                                             return;
                                                         }
 
-                                                        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://backend-laravel-utop-production.up.railway.app/api';
+                                                        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api';
                                                         const pdfUrl = `${baseUrl}/auth/ausencias/${selectedAusencia.id}/pdf`;
 
                                                         // Hacer fetch con autenticación

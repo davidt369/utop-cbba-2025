@@ -69,6 +69,7 @@ export interface Funcionario {
   numero_escalafon: string | null;
   numero_cuenta_bancaria: string | null;
   estado_funcionario: EstadoFuncionarioType;
+  motivo_eliminacion: string | null;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;

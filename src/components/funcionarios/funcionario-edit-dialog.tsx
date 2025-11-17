@@ -26,6 +26,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, EyeOff, Save, X } from "lucide-react";
 import { useFuncionariosStore } from "@/store/funcionarios.store";
+import { toast } from "sonner";
 import {
     useUpdateFuncionarioDatos,
     useUpdateFuncionarioEmail,
@@ -150,6 +151,9 @@ export function FuncionarioEditDialog() {
                 };
 
                 await updateFuncionarioMutation.mutateAsync({ id: selectedFuncionario.id, data: updateData });
+                toast.success("Datos actualizados", {
+                    description: "Los datos del funcionario han sido actualizados correctamente.",
+                });
             }
 
             // Si estamos en la pestaña de usuario -> actualizar email y/o password según corresponda
@@ -159,11 +163,17 @@ export function FuncionarioEditDialog() {
                 const currentEmail = selectedFuncionario.usuario?.email || "";
                 if (newEmail && newEmail !== currentEmail) {
                     await updateFuncionarioEmail.mutateAsync({ id: selectedFuncionario.id, email: newEmail });
+                    toast.success("Email actualizado", {
+                        description: "El email ha sido actualizado correctamente.",
+                    });
                 }
 
                 // Actualizar password si se proporcionó una nueva
                 if (data.password && data.password.trim() !== "") {
                     await updateFuncionarioPassword.mutateAsync({ id: selectedFuncionario.id, password: data.password });
+                    toast.success("Contraseña actualizada", {
+                        description: "La contraseña ha sido actualizada correctamente.",
+                    });
                 }
             }
 
@@ -174,6 +184,9 @@ export function FuncionarioEditDialog() {
         } catch (error: any) {
             // Las mutaciones ya manejan la mayoría de errores; aquí podemos loguear
             console.error("Error al actualizar funcionario/usuario:", error);
+            toast.error("Error al actualizar", {
+                description: error.response?.data?.message || error.message || "No se pudieron guardar los cambios.",
+            });
             // No cerramos el dialog para que el usuario vea el error
         }
     };

@@ -109,9 +109,10 @@ export function FuncionarioCargoBulkDialog() {
         form.setValue("cargo_ids", current.filter((cId) => cId !== id));
     };
 
-    const selectedFuncionarios = funcionarios?.filter((f) =>
-        form.watch("funcionario_ids")?.includes(f.id)
-    ) || [];
+    const selectedFuncionarios = funcionarios
+        ?.filter((f) => form.watch("funcionario_ids")?.includes(f.id))
+        .slice()
+        .sort((a, b) => a.nombre_completo.localeCompare(b.nombre_completo)) || [];
 
     const selectedCargos = cargos?.filter((c) =>
         form.watch("cargo_ids")?.includes(c.id)
@@ -155,7 +156,7 @@ export function FuncionarioCargoBulkDialog() {
                                         <CommandInput placeholder="Buscar funcionario..." />
                                         <CommandEmpty>No se encontró ningún funcionario.</CommandEmpty>
                                         <CommandGroup className="max-h-64 overflow-auto">
-                                            {funcionarios?.map((funcionario) => {
+                                            {funcionarios?.slice().sort((a, b) => a.nombre_completo.localeCompare(b.nombre_completo)).map((funcionario) => {
                                                 const selected = form.watch("funcionario_ids")?.includes(funcionario.id);
                                                 return (
                                                     <CommandItem

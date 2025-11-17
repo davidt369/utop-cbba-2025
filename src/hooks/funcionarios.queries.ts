@@ -108,8 +108,16 @@ export function useDeleteFuncionario() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: number) => {
-      const response = await api.delete(`/auth/funcionarios/${id}`);
+    mutationFn: async ({
+      id,
+      motivo_eliminacion,
+    }: {
+      id: number;
+      motivo_eliminacion: string;
+    }) => {
+      const response = await api.delete(`/auth/funcionarios/${id}`, {
+        data: { motivo_eliminacion },
+      });
       return response.data;
     },
     onSuccess: () => {

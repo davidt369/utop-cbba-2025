@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
@@ -29,7 +29,11 @@ export const metadata: Metadata = {
     apple: '/logo-utop.png',
   },
   manifest: '/manifest.json',        // PWA manifest
-  themeColor: '#0ea5a4',             // Color de la barra de estado en dispositivos
+};
+
+export const viewport: Viewport = {
+  // Color de la barra de estado en dispositivos móviles
+  themeColor: '#0ea5a4',
 };
 
 export default function RootLayout({

@@ -7,13 +7,24 @@ import { join } from "path";
 const nextConfig: NextConfig = {
   /* config options here */
   // Allow HMR websocket connections from the remote devtunnel
-  allowedDevOrigins: [
-    "https://backend-laravel-utop-production.up.railway.app/api",
-  ],
+  allowedDevOrigins: ["http://127.0.0.1:8000/api"],
 
   webpack: (config, { isServer }) => {
     // Configuración para react-pdf con mejor compatibilidad para Next.js 15
     if (!isServer) {
+      // Añadir loader para SVGs vía SVGR (emite componentes React)
+      config.module = config.module || { rules: [] };
+      config.module.rules.push({
+        test: /\.svg$/i,
+        issuer: /\.[jt]sx?$/,
+        use: [
+          {
+            loader: require.resolve("@svgr/webpack"),
+            options: { svgo: true },
+          },
+        ],
+      });
+
       config.resolve.alias = {
         ...config.resolve.alias,
         canvas: false,
@@ -30,25 +41,19 @@ const nextConfig: NextConfig = {
     return config;
   },
 
-  // Configuración experimental para Next.js 15
-  experimental: {
-    turbo: {
-      rules: {
-        "*.svg": {
-          loaders: ["@svgr/webpack"],
-          as: "*.js",
-        },
-      },
-    },
-  },
+  // Manejo de SVGs y compatibilidad con librerías que usan Node built-ins
+  // La regla de SVG se agrega en la función `webpack` para evitar claves
+  // experimentales no reconocidas por Next.js 16.
+  // Añadir turbopack vacío para evitar el error cuando existe una configuración
+  // de `webpack`. Esto silencia el aviso y permite ejecutar Next.js 16.
+  turbopack: {},
   // Rewrites para development: proxy simple a backend Laravel
   async rewrites() {
     return [
       // Proxy para endpoints de la API autenticada (usado por el frontend)
       {
         source: "/api/auth/:path*",
-        destination:
-          "https://backend-laravel-utop-production.up.railway.app/api/auth/:path*",
+        destination: "http://127.0.0.1:8000/api/auth/:path*",
       },
       // Proxy para archivos servidos desde storage (cuando Storage::url() devuelve /storage/...)
       {

@@ -27,6 +27,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, EyeOff, Plus, X } from "lucide-react";
 import { useFuncionariosStore } from "@/store/funcionarios.store";
 import { useCreateFuncionario } from "@/hooks/funcionarios.queries";
+import { toast } from "sonner";
+
 import {
     FuncionarioCreateData,
     EXPEDIDO_OPTIONS,
@@ -134,6 +136,14 @@ export function FuncionarioCreateDialog() {
             onSuccess: () => {
                 closeCreateDialog();
                 form.reset();
+                toast.success("Funcionario creado", {
+                    description: `${data.primer_nombre} ${data.primer_apellido} ha sido creado correctamente.`,
+                });
+            },
+            onError: (error: any) => {
+                toast.error("Error al crear funcionario", {
+                    description: error.response?.data?.message || error.message || "No se pudo crear el funcionario.",
+                });
             },
         });
     };

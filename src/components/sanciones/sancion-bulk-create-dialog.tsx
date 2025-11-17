@@ -93,7 +93,10 @@ export default function SancionBulkCreateDialog() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tipoSancion, fechaInicio]);
 
-    const selectedFuncionarios = funcionarios?.filter((f) => form.watch("funcionario_ids")?.includes(f.id)) || [];
+    const selectedFuncionarios = funcionarios
+        ?.filter((f) => form.watch("funcionario_ids")?.includes(f.id))
+        .slice()
+        .sort((a, b) => a.nombre_completo.localeCompare(b.nombre_completo)) || [];
 
     const removeFuncionario = (id: number) => {
         const current = form.getValues("funcionario_ids") || [];
@@ -191,7 +194,7 @@ export default function SancionBulkCreateDialog() {
                                     <CommandList>
                                         <CommandEmpty>No se encontró ningún funcionario.</CommandEmpty>
                                         <CommandGroup className="max-h-64 overflow-auto">
-                                            {funcionarios?.map((func) => {
+                                            {funcionarios?.slice().sort((a, b) => a.nombre_completo.localeCompare(b.nombre_completo)).map((func) => {
                                                 const selected = form.watch("funcionario_ids")?.includes(func.id);
                                                 return (
                                                     <CommandItem

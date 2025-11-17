@@ -14,6 +14,7 @@ import { Funcionario } from "@/types/funcionario.types";
 import { useFuncionariosStore } from "@/store/funcionarios.store";
 import { useRestoreFuncionario } from "@/hooks/funcionarios.queries";
 import Link from "next/link";
+import { toast } from "sonner";
 
 // Función helper para obtener el color del badge según el estado
 const getEstadoBadgeVariant = (estado: string) => {
@@ -171,8 +172,28 @@ export const funcionariosColumns: ColumnDef<Funcionario>[] = [
             const { openEditDialog, openDeleteDialog } = useFuncionariosStore();
             const restoreFuncionarioMutation = useRestoreFuncionario();
 
+            const nombreCompleto = [
+                funcionario.primer_nombre,
+                funcionario.segundo_nombre,
+                funcionario.primer_apellido,
+                funcionario.segundo_apellido,
+            ]
+                .filter(Boolean)
+                .join(" ");
+
             const handleRestore = () => {
-                restoreFuncionarioMutation.mutate(funcionario.id);
+                restoreFuncionarioMutation.mutate(funcionario.id, {
+                    onSuccess: () => {
+                        toast.success("Funcionario restaurado", {
+                            description: `${nombreCompleto} ha sido restaurado correctamente.`,
+                        });
+                    },
+                    onError: (error: any) => {
+                        toast.error("Error al restaurar", {
+                            description: error.response?.data?.message || error.message || "No se pudo restaurar el funcionario.",
+                        });
+                    },
+                });
             };
 
             return (

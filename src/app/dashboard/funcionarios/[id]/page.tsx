@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Edit, Trash2, RefreshCw, User, FileText, Shield, Phone, MapPin, CreditCard, Calendar, Badge } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, RefreshCw, User, FileText, Shield, Phone, MapPin, CreditCard, Calendar, Badge, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge as UIBadge } from "@/components/ui/badge";
@@ -350,6 +350,23 @@ export default function FuncionarioDetailPage() {
                         )}
                     </CardContent>
                 </Card>
+
+                {/* Motivo de Eliminación (si está eliminado) */}
+                {funcionario.deleted_at && funcionario.motivo_eliminacion && (
+                    <Card className="border-red-200 bg-red-50/50">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-red-700">
+                                <AlertTriangle className="h-5 w-5" />
+                                Motivo de Eliminación
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-gray-700">
+                                {funcionario.motivo_eliminacion}
+                            </p>
+                        </CardContent>
+                    </Card>
+                )}
             </div>
 
             {/* Dialogs */}

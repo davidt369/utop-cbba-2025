@@ -40,16 +40,10 @@ import {
 } from "@/hooks/sanciones.queries";
 
 // Componentes
-import { SancionTable } from "@/components/sanciones/sancion-table";
 import { DataTable } from "@/components/ui/data-table";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,15 +52,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-// Checkbox removed per request
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   MoreHorizontal,
   Eye,
@@ -74,11 +59,11 @@ import {
   Trash2,
   RotateCcw,
   PlayCircle,
-  // PauseCircle removed per request
   ArrowRight,
   ArrowDown,
   Minus,
   Filter,
+  Download,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { useToggleActivarSancion } from "@/hooks/sanciones.queries";
@@ -104,8 +89,6 @@ export default function SancionesPage() {
     setShowDeleted,
   } = useSancionesStore();
   const { openBulkCreateDialog } = useSancionesStore();
-
-
 
   // Estados para filtros avanzados
   const [fechaInicioFilter, setFechaInicioFilter] = useState<string>('');
@@ -141,8 +124,6 @@ export default function SancionesPage() {
     isLoading: loadingEstadisticas,
     refetch: refetchEstadisticas
   } = useSancionesStats();
-
-
 
   // Filtrar datos para DataTable
   const filteredData = useMemo(() => {
@@ -196,7 +177,7 @@ export default function SancionesPage() {
   }, [sanciones, showDeleted, tipoSancionFilter, estadoActivaFilter, fechaInicioFilter, fechaFinFilter]);
 
   const totalItems = filteredData.length;
-  console.log("Total items after filtering:", filteredData);
+
   const handleRefresh = () => {
     refetchSanciones();
     refetchEstadisticas();
@@ -253,8 +234,6 @@ export default function SancionesPage() {
     handleClearSelection();
   };
 
-
-
   // Funciones para acciones de sanciones
   const {
     openEditDialog,
@@ -272,13 +251,13 @@ export default function SancionesPage() {
 
   const getEstadoBadge = (sancion: Sancion) => {
     if (sancion.deleted_at) {
-      return <Badge variant="destructive">Eliminada</Badge>;
+      return <Badge variant="destructive" className="text-xs">Eliminada</Badge>;
     }
 
     if (sancion.activa) {
-      return <Badge className="bg-red-100 text-red-800 hover:bg-red-200">Activa</Badge>;
+      return <Badge className="bg-red-100 text-red-800 hover:bg-red-200 text-xs">Activa</Badge>;
     } else {
-      return <Badge variant="outline">Inactiva</Badge>;
+      return <Badge variant="outline" className="text-xs">Inactiva</Badge>;
     }
   };
 
@@ -289,37 +268,35 @@ export default function SancionesPage() {
     };
 
     return (
-      <Badge className={colors[tipo]}>
+      <Badge className={`${colors[tipo]} text-xs`}>
         {TIPO_SANCION_LABELS[tipo] || tipo}
       </Badge>
     );
   };
+
   // Definición de columnas para DataTable
   const columns: ColumnDef<Sancion>[] = [
-
     {
       id: "funcionario",
       header: "Funcionario",
-      // Usar accessorFn seguro (fallback cuando no exista funcionario)
       accessorFn: (row) => row.funcionario?.nombre_completo ?? "-",
       cell: ({ row }) => {
         const sancion = row.original;
         const func = sancion.funcionario;
 
-        // Si no hay funcionario, mostrar un placeholder seguro
         if (!func) {
           return (
             <div>
-              <p className="font-semibold">Sin funcionario</p>
-              <p className="text-sm text-muted-foreground">—</p>
+              <p className="font-semibold text-sm">Sin funcionario</p>
+              <p className="text-xs text-muted-foreground">—</p>
             </div>
           );
         }
 
         return (
           <div>
-            <p className="font-semibold">{func.nombre_completo}</p>
-            <p className="text-sm text-muted-foreground">{func.estado_funcionario}</p>
+            <p className="font-semibold text-sm">{func.nombre_completo}</p>
+            <p className="text-xs text-muted-foreground">{func.estado_funcionario}</p>
           </div>
         );
       },
@@ -340,7 +317,7 @@ export default function SancionesPage() {
       cell: ({ row }) => {
         const sancion = row.original;
         return (
-          <div className="space-y-1 text-sm min-w-[140px]">
+          <div className="space-y-1 text-xs min-w-[120px]">
             {sancion.fecha_inicio ? (
               <div className="flex items-center gap-1">
                 <ArrowRight className="h-3 w-3 text-green-700" />
@@ -371,13 +348,13 @@ export default function SancionesPage() {
       cell: ({ row }) => {
         const sancion = row.original;
         return (
-          <div className="space-y-2 max-w-[200px]">
+          <div className="space-y-2 max-w-[150px]">
             {sancion.descripcion ? (
-              <p className="text-sm truncate" title={sancion.descripcion}>
+              <p className="text-xs truncate" title={sancion.descripcion}>
                 {sancion.descripcion}
               </p>
             ) : (
-              <span className="text-muted-foreground text-sm">Sin descripción</span>
+              <span className="text-muted-foreground text-xs">Sin descripción</span>
             )}
 
             {sancion.pdf_respaldo_ruta && (
@@ -406,7 +383,7 @@ export default function SancionesPage() {
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuLabel>Acciones</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => openViewDialog(sancion)}>
                 <Eye className="mr-2 h-4 w-4" />
@@ -419,8 +396,6 @@ export default function SancionesPage() {
                     <Edit className="mr-2 h-4 w-4" />
                     Editar
                   </DropdownMenuItem>
-
-
 
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -449,40 +424,47 @@ export default function SancionesPage() {
       enableSorting: false,
       enableHiding: false,
     },
-  ]; if (loadingSanciones || loadingEstadisticas) {
+  ];
+
+  if (loadingSanciones || loadingEstadisticas) {
     return (
-      <div className="container mx-auto p-6 space-y-8">
-        <div className="flex items-center justify-between">
+      <div className="container mx-auto p-4 space-y-6">
+        {/* Header Skeleton */}
+        <div className="flex flex-col gap-4">
           <div className="space-y-2">
             <Skeleton className="h-8 w-64" />
-            <Skeleton className="h-4 w-96" />
+            <Skeleton className="h-4 w-48" />
           </div>
-          <Skeleton className="h-10 w-36" />
+          <div className="flex gap-2">
+            <Skeleton className="h-10 w-32" />
+            <Skeleton className="h-10 w-40" />
+          </div>
         </div>
 
-        {/* Skeleton para cards de estadísticas */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {/* Stats Skeleton */}
+        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
             <Card key={i}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-4 w-16" />
                 <Skeleton className="h-4 w-4" />
               </CardHeader>
               <CardContent>
-                <Skeleton className="h-8 w-16" />
-                <Skeleton className="h-3 w-24 mt-2" />
+                <Skeleton className="h-6 w-12" />
+                <Skeleton className="h-3 w-20 mt-1" />
               </CardContent>
             </Card>
           ))}
         </div>
 
+        {/* Table Skeleton */}
         <Card>
           <CardHeader>
             <Skeleton className="h-6 w-48" />
-            <Skeleton className="h-4 w-80" />
+            <Skeleton className="h-4 w-32" />
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {[...Array(5)].map((_, i) => (
                 <Skeleton key={i} className="h-12 w-full" />
               ))}
@@ -495,7 +477,7 @@ export default function SancionesPage() {
 
   if (errorSanciones) {
     return (
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto p-4">
         <Alert variant="destructive">
           <AlertDescription>
             Error al cargar las sanciones: {errorSanciones.message}
@@ -516,380 +498,395 @@ export default function SancionesPage() {
 
   return (
     <>
-      <div className="space-y-8">
-        {/* Header -- MODIFICADO PARA SER RESPONSIVE */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-6 pt-6">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-bold tracking-tight">Gestión de Sanciones</h1>
-            <p className="text-muted-foreground">
-              Administre las sanciones disciplinarias del personal
-            </p>
-          </div>
-          {/* grid de uno en mobile*/}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
-            <Button variant="outline" size="sm" onClick={handleRefresh} className="w-full sm:w-auto">
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Actualizar
-            </Button>
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Button onClick={openCreateDialog} className="w-full sm:w-auto">
-                <Plus className="mr-2 h-4 w-4" />
-                Nueva Sanción
-              </Button>
-              <Button variant="secondary" onClick={() => openBulkCreateDialog()} className="hidden sm:inline-flex">
-                {/* Este botón será reemplazado por la acción real al importar el diálogo */}
-                Asignar a varios
-              </Button>
+      <div className="min-h-screen bg-background">
+        {/* Header */}
+        <div className="bg-card border-b">
+          <div className="container mx-auto p-4">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="space-y-2">
+                <h1 className="text-2xl lg:text-3xl font-bold tracking-tight">Gestión de Sanciones</h1>
+                <p className="text-muted-foreground text-sm lg:text-base">
+                  Administre las sanciones disciplinarias del personal
+                </p>
+              </div>
+
+              <div className="flex flex-col xs:flex-row gap-2 w-full lg:w-auto">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefresh}
+                  className="flex-1 lg:flex-none"
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Actualizar
+                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={openCreateDialog}
+                    className="flex-1 lg:flex-none"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Nueva
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => openBulkCreateDialog()}
+                    className="flex-1 lg:flex-none"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Varios
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Estadísticas generales */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5 px-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Sanciones</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {loadingEstadisticas ? (
-                  <Skeleton className="h-8 w-16" />
-                ) : (
-                  estadisticas?.total || 0
-                )}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Sanciones registradas
-              </p>
-            </CardContent>
-          </Card>
+        {/* Contenido Principal */}
+        <div className="container mx-auto p-4 space-y-6">
+          {/* Estadísticas generales */}
+          <div className="grid gap-3 grid-cols-2 lg:grid-cols-5">
+            <Card className="col-span-2 lg:col-span-1">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xs lg:text-sm font-medium">Total Sanciones</CardTitle>
+                <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl lg:text-2xl font-bold">
+                  {estadisticas?.total || 0}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Sanciones registradas
+                </p>
+              </CardContent>
+            </Card>
 
+            <Card className="col-span-2 lg:col-span-1">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xs lg:text-sm font-medium">Activas</CardTitle>
+                <Shield className="h-4 w-4 text-red-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl lg:text-2xl font-bold">
+                  {estadisticas?.activas || 0}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Sanciones en vigor
+                </p>
+                {estadisticas?.total && estadisticas.total > 0 && (
+                  <div className="mt-1">
+                    <Badge variant="outline" className="text-red-600 bg-red-50 text-xs">
+                      {((estadisticas.activas / estadisticas.total) * 100).toFixed(1)}%
+                    </Badge>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card className="col-span-2 lg:col-span-1">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xs lg:text-sm font-medium">Funcionarios Sancionados</CardTitle>
+                <UserX className="h-4 w-4 text-orange-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl lg:text-2xl font-bold">
+                  {estadisticas?.funcionarios_con_sanciones || 0}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Con sanciones activas
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="col-span-2 lg:col-span-1">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xs lg:text-sm font-medium">Disponibles</CardTitle>
+                <Users className="h-4 w-4 text-green-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl lg:text-2xl font-bold">
+                  {estadisticas?.funcionarios_disponibles || 0}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Sin sanciones activas
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="col-span-2 lg:col-span-1">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xs lg:text-sm font-medium">Inactivas</CardTitle>
+                <Clock className="h-4 w-4 text-gray-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl lg:text-2xl font-bold">
+                  {estadisticas?.inactivas || 0}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Sanciones finalizadas
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Gráficos de estadísticas */}
+          {estadisticas && !loadingEstadisticas && (
+            <div className="grid gap-4 lg:grid-cols-2">
+              {/* Sanciones por mes */}
+              {estadisticas.sanciones_por_mes && estadisticas.sanciones_por_mes.length > 0 && (
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-sm lg:text-base">
+                      <TrendingUp className="h-4 w-4 lg:h-5 lg:w-5" />
+                      Sanciones por Mes
+                    </CardTitle>
+                    <CardDescription className="text-xs lg:text-sm">
+                      Evolución de sanciones en los últimos meses
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={250}>
+                      <BarChart data={estadisticas.sanciones_por_mes}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="mes" fontSize={12} />
+                        <YAxis fontSize={12} />
+                        <Tooltip />
+                        <Bar dataKey="total" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Distribución por tipo */}
+              {pieChartData.length > 0 && (
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-sm lg:text-base">
+                      <Activity className="h-4 w-4 lg:h-5 lg:w-5" />
+                      Tipos de Sanción
+                    </CardTitle>
+                    <CardDescription className="text-xs lg:text-sm">
+                      Distribución por tipo de sanción
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={250}>
+                      <PieChart>
+                        <Pie
+                          data={pieChartData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ name, percent }) => `${name}: ${((percent as number) * 100).toFixed(0)}%`}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                        >
+                          {pieChartData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+
+          {/* Tabla de sanciones */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Activas</CardTitle>
-              <Shield className="h-4 w-4 text-red-500" />
+            <CardHeader className="pb-4">
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                <div className="space-y-1">
+                  <CardTitle className="text-lg lg:text-xl">Lista de Sanciones</CardTitle>
+                  <CardDescription className="text-sm">
+                    Gestione todas las sanciones registradas en el sistema
+                  </CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="text-xs">
+                    {totalItems} registros
+                  </Badge>
+                  {(searchTerm || tipoSancionFilter || estadoActivaFilter || fechaInicioFilter || fechaFinFilter) && (
+                    <Badge variant="outline" className="text-blue-600 border-blue-200 text-xs">
+                      Filtros activos
+                    </Badge>
+                  )}
+                </div>
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {loadingEstadisticas ? (
-                  <Skeleton className="h-8 w-16" />
-                ) : (
-                  estadisticas?.activas || 0
+
+            <CardContent className="space-y-4">
+              {/* Filtros principales */}
+              <div className="flex flex-col gap-3">
+                <div className="grid grid-cols-1 xs:grid-cols-2 lg:flex lg:flex-row gap-3">
+                  {/* Filtro por tipo de sanción */}
+                  <div className="flex-1 min-w-[150px]">
+                    <Select
+                      value={tipoSancionFilter || "all"}
+                      onValueChange={(value) => setTipoSancionFilter(value === "all" ? null : value as TipoSancion)}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Tipo de sanción" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos los tipos</SelectItem>
+                        {TIPOS_SANCION.map((tipo) => (
+                          <SelectItem key={tipo} value={tipo}>
+                            {TIPO_SANCION_LABELS[tipo] || tipo}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Filtro por estado activa */}
+                  <div className="flex-1 min-w-[140px]">
+                    <Select
+                      value={estadoActivaFilter || "all"}
+                      onValueChange={(value) => setEstadoActivaFilter(value === "all" ? null : value as 'activa' | 'inactiva')}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Estado" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos</SelectItem>
+                        <SelectItem value="activa">Activas</SelectItem>
+                        <SelectItem value="inactiva">Inactivas</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Toggle eliminados */}
+                  <div className="flex items-center gap-2 bg-muted/50 p-2 rounded-lg xs:col-span-2 lg:col-span-1">
+                    <Switch
+                      id="show-deleted"
+                      checked={showDeleted}
+                      onCheckedChange={setShowDeleted}
+                      className="scale-90"
+                    />
+                    <Label htmlFor="show-deleted" className="text-sm whitespace-nowrap">
+                      Mostrar eliminados
+                    </Label>
+                  </div>
+                </div>
+
+                {/* Filtros avanzados */}
+                <div className="flex flex-col-2 xs:flex-row mt-2 gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                    className="flex items-center gap-2 flex-1 xs:flex-none"
+                    size="sm"
+                  >
+                    <Filter className="h-4 w-4" />
+                    <span>Filtros Avanzados</span>
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    onClick={handleClearFilters}
+                    size="sm"
+                    className="flex-1 xs:flex-none"
+                  >
+                    Limpiar Filtros
+                  </Button>
+                </div>
+
+                {/* Filtros avanzados desplegables */}
+                {showAdvancedFilters && (
+                  <div className="bg-muted/30 p-4 rounded-lg space-y-4 border">
+                    <h4 className="text-sm font-medium">Filtros por Fecha</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="fecha-inicio-filter" className="text-sm">Fecha inicio desde:</Label>
+                        <Input
+                          id="fecha-inicio-filter"
+                          type="date"
+                          value={fechaInicioFilter}
+                          onChange={(e) => setFechaInicioFilter(e.target.value)}
+                          className="w-full"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="fecha-fin-filter" className="text-sm">Fecha fin hasta:</Label>
+                        <Input
+                          id="fecha-fin-filter"
+                          type="date"
+                          value={fechaFinFilter}
+                          onChange={(e) => setFechaFinFilter(e.target.value)}
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
+
+                    {(fechaInicioFilter || fechaFinFilter) && (
+                      <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
+                        <span>Filtros activos:</span>
+                        {fechaInicioFilter && (
+                          <Badge variant="secondary" className="text-xs">
+                            Inicio ≥ {fechaInicioFilter}
+                          </Badge>
+                        )}
+                        {fechaFinFilter && (
+                          <Badge variant="secondary" className="text-xs">
+                            Fin ≤ {fechaFinFilter}
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground">
-                Sanciones en vigor
-              </p>
-              {estadisticas?.total && estadisticas.total > 0 && (
-                <div className="mt-1">
-                  <Badge variant="outline" className="text-red-600 bg-red-50">
-                    {((estadisticas.activas / estadisticas.total) * 100).toFixed(1)}%
-                  </Badge>
+
+              {/* Acciones en lote */}
+              {selectedRows.length > 0 && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="text-xs">
+                        {selectedRows.length} seleccionado{selectedRows.length !== 1 ? 's' : ''}
+                      </Badge>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleClearSelection}
+                        className="h-8 text-xs"
+                      >
+                        Limpiar
+                      </Button>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleBulkActivate}
+                        disabled={toggleActivarMutation.isPending}
+                        className="h-8 text-xs"
+                      >
+                        <PlayCircle className="h-3 w-3 mr-1" />
+                        Activar
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Funcionarios Sancionados</CardTitle>
-              <UserX className="h-4 w-4 text-orange-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {loadingEstadisticas ? (
-                  <Skeleton className="h-8 w-16" />
-                ) : (
-                  estadisticas?.funcionarios_con_sanciones || 0
-                )}
+              {/* DataTable */}
+              <div className="overflow-hidden">
+                <DataTable
+                  columns={columns}
+                  data={filteredData}
+                  searchKey="funcionario"
+                  searchPlaceholder="Buscar por funcionario, tipo o descripción..."
+                />
               </div>
-              <p className="text-xs text-muted-foreground">
-                Con sanciones activas
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Funcionarios Disponibles</CardTitle>
-              <Users className="h-4 w-4 text-green-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {loadingEstadisticas ? (
-                  <Skeleton className="h-8 w-16" />
-                ) : (
-                  estadisticas?.funcionarios_disponibles || 0
-                )}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Sin sanciones activas
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Inactivas</CardTitle>
-              <Clock className="h-4 w-4 text-gray-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {loadingEstadisticas ? (
-                  <Skeleton className="h-8 w-16" />
-                ) : (
-                  estadisticas?.inactivas || 0
-                )}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Sanciones finalizadas
-              </p>
             </CardContent>
           </Card>
         </div>
-
-        {/* Gráficos de estadísticas */}
-        {estadisticas && !loadingEstadisticas && (
-          <div className="grid gap-4 md:grid-cols-2 px-6">
-            {/* Sanciones por mes */}
-            {estadisticas.sanciones_por_mes && estadisticas.sanciones_por_mes.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5" />
-                    Sanciones por Mes
-                  </CardTitle>
-                  <CardDescription>
-                    Evolución de sanciones en los últimos meses
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={estadisticas.sanciones_por_mes}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="mes" />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="total" fill="#ef4444" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Distribución por tipo */}
-            {pieChartData.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Activity className="h-5 w-5" />
-                    Tipos de Sanción
-                  </CardTitle>
-                  <CardDescription>
-                    Distribución por tipo de sanción
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={pieChartData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, percent }) => `${name}: ${((percent as number) * 100).toFixed(0)}%`}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {pieChartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        )}
-
-
-
-        {/* Tabla de sanciones con DataTable de shadcn/ui */}
-        <Card className="mx-6">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <span>Lista de Sanciones</span>
-                <Badge variant="secondary">
-                  {totalItems} registros
-                </Badge>
-                {(searchTerm || tipoSancionFilter || estadoActivaFilter || fechaInicioFilter || fechaFinFilter) && (
-                  <Badge variant="outline" className="text-blue-600 border-blue-200">
-                    Filtros activos
-                  </Badge>
-                )}
-              </div>
-            </CardTitle>
-            <CardDescription>
-              Gestione todas las sanciones registradas en el sistema.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Controles de filtros adicionales */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              {/* Filtro por tipo de sanción */}
-              <Select
-                value={tipoSancionFilter || "all"}
-                onValueChange={(value) => setTipoSancionFilter(value === "all" ? null : value as TipoSancion)}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Tipo de sanción" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos los tipos</SelectItem>
-                  {TIPOS_SANCION.map((tipo) => (
-                    <SelectItem key={tipo} value={tipo}>
-                      {TIPO_SANCION_LABELS[tipo] || tipo}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              {/* Filtro por estado activa */}
-              <Select
-                value={estadoActivaFilter || "all"}
-                onValueChange={(value) => setEstadoActivaFilter(value === "all" ? null : value as 'activa' | 'inactiva')}
-              >
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="Estado" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="activa">Activas</SelectItem>
-                  <SelectItem value="inactiva">Inactivas</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* Toggle eliminados */}
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="show-deleted"
-                  checked={showDeleted}
-                  onCheckedChange={setShowDeleted}
-                />
-                <Label htmlFor="show-deleted" className="text-sm">
-                  Eliminados
-                </Label>
-              </div>
-
-              {/* Botón filtros avanzados */}
-              <Button
-                variant="outline"
-                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                className="flex items-center space-x-2"
-              >
-                <Filter className="h-4 w-4" />
-                <span>Filtros</span>
-              </Button>
-
-              {/* Botón limpiar filtros */}
-              <Button
-                variant="outline"
-                onClick={handleClearFilters}
-                size="sm"
-              >
-                Limpiar
-              </Button>
-            </div>
-
-            {/* Filtros avanzados desplegables */}
-            {showAdvancedFilters && (
-              <div className="bg-muted/50 p-4 rounded-lg space-y-4">
-                <h4 className="text-sm font-medium">Filtros Avanzados</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="fecha-inicio-filter">Fecha inicio desde:</Label>
-                    <Input
-                      id="fecha-inicio-filter"
-                      type="date"
-                      value={fechaInicioFilter}
-                      onChange={(e) => setFechaInicioFilter(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="fecha-fin-filter">Fecha fin hasta:</Label>
-                    <Input
-                      id="fecha-fin-filter"
-                      type="date"
-                      value={fechaFinFilter}
-                      onChange={(e) => setFechaFinFilter(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                {(fechaInicioFilter || fechaFinFilter) && (
-                  <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                    <span>Filtros activos:</span>
-                    {fechaInicioFilter && (
-                      <Badge variant="secondary">
-                        Inicio ≥ {fechaInicioFilter}
-                      </Badge>
-                    )}
-                    {fechaFinFilter && (
-                      <Badge variant="secondary">
-                        Fin ≤ {fechaFinFilter}
-                      </Badge>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Acciones en lote */}
-            {selectedRows.length > 0 && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Badge variant="secondary">
-                      {selectedRows.length} elemento{selectedRows.length !== 1 ? 's' : ''} seleccionado{selectedRows.length !== 1 ? 's' : ''}
-                    </Badge>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleClearSelection}
-                    >
-                      Limpiar selección
-                    </Button>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleBulkActivate}
-                      disabled={toggleActivarMutation.isPending}
-                    >
-                      <PlayCircle className="h-4 w-4 mr-2" />
-                      Activar seleccionadas
-                    </Button>
-                    {/* Botón de desactivar eliminado */}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* DataTable de shadcn/ui */}
-            <DataTable
-              columns={columns}
-              data={filteredData}
-              searchKey="funcionario"
-              searchPlaceholder="Buscar por funcionario, tipo o descripción..."
-            />
-          </CardContent>
-        </Card>
       </div>
 
       {/* Diálogos */}
