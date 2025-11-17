@@ -104,7 +104,8 @@ export default function DeleteFuncionarioPage() {
             return;
         }
 
-        deleteFuncionarioMutation.mutate(funcionario.id, {
+        // La mutación espera un objeto con `id` y `motivo_eliminacion`
+        deleteFuncionarioMutation.mutate({ id: funcionario.id, motivo_eliminacion: "" }, {
             onSuccess: () => {
                 router.push("/dashboard/funcionarios");
             },
